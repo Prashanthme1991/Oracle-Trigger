@@ -1,0 +1,35 @@
+1.How to create DB link in Oracle
+When we have multiple databases in our environment and we want to send and receive data to and from these databases we can use DB link for this purpose.i.e we have database named as ora_db and new_ardb and we want to establish link between these database.
+->Following steps describe to establish DB link between these databases.
+First copy sid from new_ardb database server tnsnames.ora file to ora_db database server tnsnames.ora file.
+In my case following sample Sid will be copied to ora_db tnsnames.ora.
+NEW_ARDB=
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST=NEW_ARDB.ALI.COM) (PORT=1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME=NEW_ARDB.ALI.COM)
+    )
+  )   now on ora_db database go command prompt and ping the new Sid you have added.
+c:\>tnsping new_ardb
+->if ping response is ok then we are ok to proceed for the next step.
+login to ora_db as dba user and execute following command to create DB link.
+Syntax:  
+CREATE DATABASE LINK [DB link name] CONNECT TO [Username] IDENTIFIED BY [Password] USING ['SERVICE NAME'];
+
+Example:
+CREATE DATABASE LINK NEW_ARDB CONNECT TO SYSTEM IDENTIFIED BY SYSTEM  USING 'NEWARDB';
+now try to execute following command to check if the DB link is working .
+select * from DUAL@NEW_ARDB;
+if  above command execute successfully you link is working fine and you can query other tables from the new_ardb database but remember to add DB link while accessing tables from the new_ardb database.i.e  To access emp table in scott schema on the new_ardb use following command.
+select * from scott.emp@new_ardb;
+
+2. How to execute package or procedure using DB link in Oracle
+To execute package or procure using DB link in Oracle database first create DB link .
+Now you can call package or procedure using db link as follows.
+Syntax:
+exec schema.porcedure@db_link( {parameteres });
+exec schema.package.procedure@db_link ([parameters});
+Example:
+exec ali_db.calculate_tax@raza_db (10000);
+exec ali_db.tax_package.calculate_tax@raza_db (10000);
